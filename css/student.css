@@ -1,0 +1,133 @@
+/* Student styles */
+
+.student-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.student-container h2 {
+  text-align: center;
+  margin-bottom: var(--space-4);
+  color: var(--primary-600);
+}
+
+#attendanceForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.form-group label {
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--neutral-700);
+}
+
+.form-group label i {
+  color: var(--primary-500);
+}
+
+.form-group input {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-400);
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+}
+
+.form-group input::placeholder {
+  color: var(--neutral-400);
+}
+
+#attendanceForm button {
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  font-size: var(--font-size-md);
+}
+
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity var(--transition-normal), transform var(--transition-normal);
+}
+
+.success-message.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.success-message i {
+  font-size: var(--font-size-lg);
+  color: var(--primary-500);
+}
+
+/* Submit button animation */
+.primary-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.primary-btn:after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.primary-btn:focus:not(:active)::after {
+  animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  20% {
+    transform: scale(25, 25);
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(40, 40);
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .student-container {
+    padding: 0 var(--space-2);
+  }
+  
+  .card {
+    padding: var(--space-3);
+  }
+  
+  #attendanceForm button {
+    padding: var(--space-2);
+  }
+}

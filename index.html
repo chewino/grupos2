@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Control de Asistencias - Docente</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #eef2f7; }
+    .container { background: white; padding: 20px; max-width: 1000px; margin: auto; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    input, select, button, textarea { width: 100%; margin: 10px 0; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; border: 1px solid #ccc; }
+    th { background: #f0f0f0; }
+    button { background-color: #007bff; color: white; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📚 Carga de Clases y Alumnos</h2>
+    <input type="file" id="archivoExcel" accept=".xlsx,.xls" />
+    <textarea id="manualInput" placeholder="O escribe manualmente: Nombre, Clave, Grupo..." rows="4"></textarea>
+    <button onclick="procesarCarga()">Cargar Alumnos</button>
+
+    <h3>✅ Lista de Alumnos Cargados</h3>
+    <table id="tablaAlumnos">
+      <thead>
+        <tr><th>Nombre</th><th>Clave</th><th>Grupo</th><th>¿Presente?</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <button onclick="generarAsistencia()">Pasar Lista y Exportar a Excel</button>
+    <button onclick="verReporte()">Ver Reporte para Padres</button>
+
+    <div id="reportePadres" style="display:none">
+      <h3>📋 Reporte en Línea para Padres</h3>
+      <ul id="reporteLista"></ul>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as XLSX from 'xlsx';
+
+    let alumnos = [];
+
+    window.procesarCarga = function() {
+      const textarea = document.getElementById("manualInput").value.trim();
+      if (textarea) {
+        alumnos = textarea.split("\n").map(linea => {
+          const partes = linea.split(",");
+          return { nombre: partes[0]?.trim(), clave: partes[1]?.trim(), grupo: partes[2]?.trim(), presente: false };
+        });
+      }
+      mostrarAlumnos();
+    }
+
+    function mostrarAlumnos() {
+      const tbody = document.querySelector("#tablaAlumnos tbody");
+      tbody.innerHTML = "";
+      alumnos.forEach((alumno, i) => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${alumno.nombre}</td>
+          <td>${alumno.clave}</td>
+          <td>${alumno.grupo}</td>
+          <td><input type='checkbox' onchange='marcarPresente(${i}, this)' /></td>
+        `;
+        tbody.appendChild(fila);
+      });
+    }
+
+    window.marcarPresente = function(i, checkbox) {
+      alumnos[i].presente = checkbox.checked;
+    }
+
+    window.generarAsistencia = function() {
+      const data = alumnos.map(al => ({
+        Nombre: al.nombre,
+        Clave: al.clave,
+        Grupo: al.grupo,
+        Asistencia: al.presente ? "Presente" : "Falta"
+      }));
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(data);
+      XLSX.utils.book_append_sheet(wb, ws, "Asistencia");
+      XLSX.writeFile(wb, "lista_asistencia.xlsx");
+    }
+
+    window.verReporte = function() {
+      document.getElementById("reportePadres").style.display = "block";
+      const ul = document.getElementById("reporteLista");
+      ul.innerHTML = "";
+      alumnos.forEach(al => {
+        const li = document.createElement("li");
+        li.textContent = `${al.nombre} - ${al.presente ? "✅ Asistió" : "❌ No asistió"}`;
+        ul.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
